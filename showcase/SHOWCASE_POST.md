@@ -10,7 +10,7 @@ nothing. It pings me only when something changed: a new token landed, or the
 risky slice of the wallet grew. When I ask it directly, it sends a short brief.
 
 Demo (under 3 min): <link>
-Code and config: <link>
+Code and config: https://github.com/Alberluk1/portfolio-guardian
 
 ## What it does
 
