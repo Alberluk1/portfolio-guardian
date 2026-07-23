@@ -1,0 +1,9 @@
+[sop]
+name = "new-token-alert"
+description = "Stay silent unless a new or newly-risky token shows up in the watched wallet"
+version = "1.0.0"
+max_concurrent = 1
+
+[[triggers]]
+type = "cron"
+schedule = "0 */4 * * *"

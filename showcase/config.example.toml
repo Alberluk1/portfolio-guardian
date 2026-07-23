@@ -1,0 +1,58 @@
+schema_version = 3
+
+[memory]
+search_mode = "bm25"
+
+[plugins]
+enabled = true
+auto_discover = true
+
+[[plugins.entries]]
+name = "portfolio-brief"
+enabled = true
+
+[plugins.entries.config]
+rpc_url = "https://api.mainnet-beta.solana.com:443"
+dust_threshold_usd = "1.0"
+
+[channels.telegram.default]
+enabled = true
+
+[agents.guardian]
+enabled = true
+model_provider = "ollama.local"
+channels = ["telegram.default"]
+risk_profile = "guardian"
+runtime_profile = "guardian"
+
+[agents.guardian.identity]
+format = "openclaw"
+
+[agents.guardian.memory]
+backend = "sqlite"
+
+[agents.guardian.workspace]
+unrestricted_filesystem = false
+
+[risk_profiles.guardian]
+level = "readonly"
+workspace_only = true
+require_approval_for_medium_risk = true
+block_high_risk_commands = true
+auto_approve = ["portfolio_brief"]
+always_ask = []
+allowed_tools = ["portfolio_brief"]
+excluded_tools = []
+
+[runtime_profiles.guardian]
+agentic = true
+max_tool_iterations = 4
+max_actions_per_hour = 30
+max_cost_per_day_cents = 0
+max_tool_result_chars = 4000
+strict_tool_parsing = true
+
+[providers.models.ollama.local]
+uri = "http://127.0.0.1:11434/v1"
+model = "qwen3:4b-instruct-2507-q4_K_M"
+temperature = 0.0

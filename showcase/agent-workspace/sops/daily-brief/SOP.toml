@@ -1,0 +1,9 @@
+[sop]
+name = "daily-brief"
+description = "Morning risk-annotated portfolio brief for the watched wallet"
+version = "1.0.0"
+max_concurrent = 1
+
+[[triggers]]
+type = "cron"
+schedule = "0 8 * * *"
