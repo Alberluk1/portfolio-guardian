@@ -17,6 +17,7 @@ dust_threshold_usd = "1.0"
 
 [channels.telegram.default]
 enabled = true
+# bot_token is a secret: set it with `zeroclaw config set channels.telegram.default.bot_token`
 
 [agents.guardian]
 enabled = true
@@ -24,6 +25,11 @@ model_provider = "ollama.local"
 channels = ["telegram.default"]
 risk_profile = "guardian"
 runtime_profile = "guardian"
+
+# a bare wallet address reads as "chatter" to the reply-intent classifier, which
+# then stays silent, so turn it off and the bot always answers.
+[agents.guardian.precheck]
+enabled = false
 
 [agents.guardian.identity]
 format = "openclaw"
@@ -37,22 +43,24 @@ unrestricted_filesystem = false
 [risk_profiles.guardian]
 level = "readonly"
 workspace_only = true
-require_approval_for_medium_risk = true
-block_high_risk_commands = true
 auto_approve = ["portfolio_brief"]
-always_ask = []
 allowed_tools = ["portfolio_brief"]
-excluded_tools = []
 
 [runtime_profiles.guardian]
 agentic = true
 max_tool_iterations = 4
-max_actions_per_hour = 30
-max_cost_per_day_cents = 0
 max_tool_result_chars = 4000
 strict_tool_parsing = true
+# keep each wallet query independent so a previous wallet's data can never bleed
+# into a new answer.
+max_history_messages = 1
+keep_tool_context_turns = 0
 
 [providers.models.ollama.local]
+# point this at your ollama endpoint (local, or a GPU box on the LAN)
 uri = "http://127.0.0.1:11434/v1"
-model = "qwen3:4b-instruct-2507-q4_K_M"
+model = "qwen2.5:7b"
 temperature = 0.0
+num_ctx = 8192
+# without native tool-calling the model tends not to call the tool at all
+native_tools = true

@@ -92,6 +92,16 @@ reproduce this: plugins are not in the release binary (you build the host with
 `--features plugins-wasm-cranelift`), and `plugins.enabled` is false by default,
 so an installed plugin's tools silently never reach the agent until you flip it.
 
+Three runtime settings turned out to be load-bearing, and the config example
+carries all three. The model has to be told to use native tool-calling
+(`native_tools = true`), or a small model just answers from its own head and
+never calls the tool. The reply-intent precheck classifies a bare wallet address
+as "chatter" and stays silent, so it has to be off. And history has to be capped
+(`max_history_messages = 1`), or on a second query the model blends the previous
+wallet's numbers into the new answer. That last one is the one that matters for a
+read-only tool: a hallucinated balance is worse than no balance, so each query is
+kept independent.
+
 ## Known limits
 
 Concentration comes from Jupiter's audit number, not my own on-chain holder scan.
