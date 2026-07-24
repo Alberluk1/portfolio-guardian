@@ -211,6 +211,10 @@ pub fn render_human(brief: &PortfolioBrief, wallet_short: &str) -> String {
         short_usd(brief.safe_usd),
         short_usd(brief.risky_usd)
     ));
+    let reds = brief.holdings.iter().filter(|h| h.risk == Risk::Red).count();
+    let ambers = brief.holdings.iter().filter(|h| h.risk == Risk::Amber).count();
+    let greens = brief.holdings.iter().filter(|h| h.risk == Risk::Green).count();
+    lines.push(format!("🚦 {reds}🔴 · {ambers}🟡 · {greens}🟢"));
     lines.push(format!("◎ SOL: {}", grouped_usd(brief.sol_usd)));
 
     for h in brief.holdings.iter().take(10) {
