@@ -112,22 +112,29 @@ pub fn score(
 ) -> RiskReport {
     let mut signals = Vec::new();
 
-    if mint.mint_authority.is_some() {
-        if verified {
-            signals.push(signal(Risk::Amber,
-                "mint authority retained by the issuer (verified)"));
-        } else {
-            signals.push(signal(Risk::Red,
-                "unknown issuer can mint unlimited supply"));
+    let has_mint = mint.mint_authority.is_some();
+    let has_freeze = mint.freeze_authority.is_some();
+    if verified && has_mint && has_freeze {
+        signals.push(signal(Risk::Amber,
+            "mint & freeze authority retained by the issuer (verified)"));
+    } else {
+        if has_mint {
+            if verified {
+                signals.push(signal(Risk::Amber,
+                    "mint authority retained by the issuer (verified)"));
+            } else {
+                signals.push(signal(Risk::Red,
+                    "unknown issuer can mint unlimited supply"));
+            }
         }
-    }
-    if mint.freeze_authority.is_some() {
-        if verified {
-            signals.push(signal(Risk::Amber,
-                "freeze authority retained by the issuer (verified)"));
-        } else {
-            signals.push(signal(Risk::Red,
-                "unknown issuer can freeze wallets"));
+        if has_freeze {
+            if verified {
+                signals.push(signal(Risk::Amber,
+                    "freeze authority retained by the issuer (verified)"));
+            } else {
+                signals.push(signal(Risk::Red,
+                    "unknown issuer can freeze wallets"));
+            }
         }
     }
 
