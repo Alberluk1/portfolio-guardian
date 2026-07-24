@@ -115,49 +115,46 @@ pub fn score(
     if mint.mint_authority.is_some() {
         if verified {
             signals.push(signal(Risk::Amber,
-                "Mint authority retained by the issuer (standard for regulated or centralized tokens; verified on Jupiter)."));
+                "mint authority retained by the issuer (verified)"));
         } else {
             signals.push(signal(Risk::Red,
-                "Mint authority is active: an unknown, unverified creator can print unlimited new supply."));
+                "unknown issuer can mint unlimited supply"));
         }
     }
     if mint.freeze_authority.is_some() {
         if verified {
             signals.push(signal(Risk::Amber,
-                "Freeze authority retained by the issuer (compliance freezes; standard for regulated stablecoins; verified on Jupiter)."));
+                "freeze authority retained by the issuer (verified)"));
         } else {
             signals.push(signal(Risk::Red,
-                "Freeze authority is active: an unknown, unverified creator can freeze any holder's wallet."));
+                "unknown issuer can freeze wallets"));
         }
     }
 
     for e in exts {
         signals.push(match e {
             Extension::PermanentDelegate => signal(Risk::Red,
-                "Permanent delegate: an address can seize or burn anyone's tokens forever."),
+                "permanent delegate can seize any wallet"),
             Extension::NonTransferable => signal(Risk::Red,
-                "Non-transferable: the token cannot be sent at all."),
+                "non-transferable, cannot be sent"),
             Extension::TransferHook => signal(Risk::Amber,
-                "Transfer hook: custom code runs on every transfer and could block selling."),
+                "transfer hook runs on every transfer"),
             Extension::TransferFee => signal(Risk::Amber,
-                "Transfer fee: a tax is taken on every transfer (could be very high)."),
+                "transfer fee on every transfer"),
             Extension::DefaultAccountState => signal(Risk::Amber,
-                "Default account-state extension present: new holders may start frozen (verify)."),
+                "new accounts may start frozen"),
             Extension::MintCloseAuthority => signal(Risk::Amber,
-                "Mint close authority: the mint can be closed."),
+                "mint can be closed"),
             Extension::Unknown(t) => signal(Risk::Amber,
-                &format!("Unknown extension (type {t}): behavior not understood; be cautious.")),
+                &format!("unknown extension (type {t})")),
         });
     }
 
     if let Some(c) = conc {
         if c.top1_pct >= 50.0 {
-            signals.push(signal(Risk::Amber, &format!(
-                "Top holder owns {:.0}% of supply. If this is not a liquidity pool, that is a high dump risk.",
-                c.top1_pct)));
+            signals.push(signal(Risk::Amber, &format!("top holder owns {:.0}%", c.top1_pct)));
         } else if c.top10_pct >= 70.0 {
-            signals.push(signal(Risk::Amber, &format!(
-                "Top 10 holders own {:.0}% of supply (fairly concentrated).", c.top10_pct)));
+            signals.push(signal(Risk::Amber, &format!("top 10 hold {:.0}%", c.top10_pct)));
         }
     }
 
