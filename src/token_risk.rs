@@ -43,6 +43,8 @@ pub enum Extension {
     NonTransferable,
     PermanentDelegate,
     TransferHook,
+    MetadataPointer,
+    TokenMetadata,
     Unknown(u16),
 }
 
@@ -68,6 +70,8 @@ pub fn parse_extensions(data: &[u8]) -> Vec<Extension> {
             9 => Extension::NonTransferable,
             12 => Extension::PermanentDelegate,
             14 => Extension::TransferHook,
+            18 => Extension::MetadataPointer,
+            19 => Extension::TokenMetadata,
             other => Extension::Unknown(other),
         });
         i = end;
@@ -139,7 +143,7 @@ pub fn score(
     }
 
     for e in exts {
-        signals.push(match e {
+        let s = match e {
             Extension::PermanentDelegate => signal(Risk::Red,
                 "permanent delegate can seize any wallet"),
             Extension::NonTransferable => signal(Risk::Red,
@@ -152,9 +156,11 @@ pub fn score(
                 "new accounts may start frozen"),
             Extension::MintCloseAuthority => signal(Risk::Amber,
                 "mint can be closed"),
+            Extension::MetadataPointer | Extension::TokenMetadata => continue,
             Extension::Unknown(t) => signal(Risk::Amber,
                 &format!("unknown extension (type {t})")),
-        });
+        };
+        signals.push(s);
     }
 
     if let Some(c) = conc {
@@ -306,6 +312,12 @@ mod tests {
     #[test]
     fn transfer_hook_only_is_amber() {
         assert_eq!(score(&clean_mint(), &[Extension::TransferHook], None, false).risk, Risk::Amber);
+    }
+
+    #[test]
+    fn metadata_extensions_are_benign() {
+        let exts = [Extension::MetadataPointer, Extension::TokenMetadata];
+        assert_eq!(score(&clean_mint(), &exts, None, false).risk, Risk::Green);
     }
 
     #[test]
