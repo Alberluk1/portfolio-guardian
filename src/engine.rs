@@ -124,10 +124,10 @@ fn assess_risk(http: &dyn Http, mint: &str, meta: Option<&tokens::TokenMeta>) ->
     match meta {
         None => report
             .signals
-            .push(Signal { severity: Risk::Amber, reason: "not indexed by Jupiter".to_string() }),
+            .push(Signal { severity: Risk::Amber, reason: "not on Jupiter".to_string() }),
         Some(m) if !m.is_verified => report
             .signals
-            .push(Signal { severity: Risk::Amber, reason: "unverified on Jupiter".to_string() }),
+            .push(Signal { severity: Risk::Amber, reason: "unverified".to_string() }),
         _ => {}
     }
 

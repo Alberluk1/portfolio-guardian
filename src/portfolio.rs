@@ -215,7 +215,7 @@ pub fn render_human(brief: &PortfolioBrief, wallet_short: &str) -> String {
     let ambers = brief.holdings.iter().filter(|h| h.risk == Risk::Amber).count();
     let greens = brief.holdings.iter().filter(|h| h.risk == Risk::Green).count();
     lines.push(format!("🚦 {reds}🔴 · {ambers}🟡 · {greens}🟢"));
-    lines.push(format!("◎ SOL: {}", grouped_usd(brief.sol_usd)));
+    lines.push(format!("◎ SOL {}", short_usd(brief.sol_usd)));
 
     for h in brief.holdings.iter().take(10) {
         let dot = match h.risk {
@@ -224,15 +224,15 @@ pub fn render_human(brief: &PortfolioBrief, wallet_short: &str) -> String {
             Risk::Green => "🟢",
         };
         let change = match h.price_change_24h_pct {
-            Some(p) => format!(" ({p:+.1}% 24h)"),
+            Some(p) => format!(" ({p:+.1}%)"),
             None => String::new(),
         };
         let reason = if h.risk != Risk::Green && !h.risk_reason.is_empty() {
-            format!("  {}", h.risk_reason)
+            format!(" · {}", h.risk_reason)
         } else {
             String::new()
         };
-        lines.push(format!("{dot} {}: {}{change}{reason}", h.symbol, grouped_usd(h.usd_value)));
+        lines.push(format!("{dot} {} {}{change}{reason}", h.symbol, short_usd(h.usd_value)));
     }
 
     if brief.holdings.len() > 10 {
